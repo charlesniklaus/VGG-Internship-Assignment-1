@@ -1,4 +1,5 @@
-
+from random import randint
+from abc import ABCMeta, abstractmethod
 '''
 
 Build a command-line Banking Application with the following functionalities:
@@ -18,79 +19,114 @@ Application starts with a prompt to the user with the following options: Press 1
 '''
 
 
+class Account(metaclass=ABCMeta):
+    @abstractmethod
+    def createAccount():
+        return 0
+
+    @abstractmethod
+    def transact():
+        return 0
+
+    @abstractmethod
+    def deposit():
+        return 0
+
+    @abstractmethod
+    def checkBalance():
+        return 0
+
+    @abstractmethod
+    def transfer():
+        return 0
 
 
+class SavingsAccount(Account):
+    # Initialize the dictionary to accept all account numbers
+    def __init__(self):
+        self.savingsAccount = {}
 
-def balance():
-    bal = 0
-    return bal
-
-
-balance()
-
-
-def menu1():
-    print('Welcome to the Pythonista Bank of Africa')
-    print('Press 1 to create an account')
-    print('Press 2 for transactions')
-    print('Use any other number to exit')
-    selection = input()
-
-    if selection == str(1):
-        print('Enter your email: ')
-        mail = input()
-        print(mail)
-        print('Enter your PIN')
-        pin = input()
-        print(pin)
+    def createAccount(self, name, initialDeposit):
+        # Generate a random account number
+        self.accountNumber = randint(10000, 99999)
+        # Assign a key and values
+        self.savingsAccount[self.accountNumber] = [name, initialDeposit]
         print('Hurray!!\n'
-              'You have successfully created an account with Pythonista Bank of Africa!!')
-        print('Your balance is: ', balance())
+              'You have successfully created an account with Pythonista Bank of Africa!!. Your account number is ',
+              self.accountNumber)
 
-    else:
-        if input() >= 3:
-            quit()
+    def transact(self, name, accountNumber):
+        if accountNumber in self.savingsAccount.keys():
+            if self.savingsAccount[self.accountNumber][0] == name:
+                print('Authentication Successful')
+                return True
+            else:
+                print('Authentication failed')
 
+    def deposit(self, depositAmount):
+        self.savingsAccount[self.accountNumber][1] += depositAmount
+        print('Your deposit was successful')
+        print('Available balance: ', self.checkBalance())
 
-menu1()
+    def checkBalance(self):
+        print('Available balance: ', self.savingsAccount[self.accountNumber][1])
 
+    def withdraw(self, withdrawalAmount):
+        if withdrawalAmount > self.savingsAccount[self.accountNumber][1]:
+            print('Insufficient balance')
+        else:
+            self.savingsAccount[self.accountNumber][1] -= withdrawalAmount
+            print('Withdrawal was successful')
+            self.checkBalance()
 
-def menu2():
-    mail = 'babyboy@gmail.com'
-    password = 'hwhayd@'
-    print('Input your email address')
-    input(mail)
-    print('Input your password')
-    input(password)
-    print('Press 1 to check balance')
-    print('Press 2 to make a deposit')
-    print('Press 3 to withdraw')
-    print('Press 4 to transfer')
-    selection = input()
-    if selection == str(1):
-        print('Your balance is ', balance())
-        return menu2()
-    elif selection == str(2):
-        print('Enter an amount')
-        amount = input()
-        newBalance = int(amount) + balance()
-        print(newBalance)
-        return menu2()
-    elif selection == str(3):
-        if balance() >= 0:
-            print('Enter amount')
-            withdrawAmount = input()
-            print('You have withdrawn: ' + withdrawAmount)
-            remainingBalance = int(withdrawAmount) - int(withdrawAmount)
-            print('Your available balance is: ', remainingBalance)
-            return menu2()
-    elif selection == str(4):
-        print('Enter the email of the recipient')
-        email = input()
-        print('Enter amount')
-        amount = input()
-        remainingBalance = int(amount) - balance()
-        print(remainingBalance)
+    def transfer(self, transferAmount):
+        print('Enter recipient email address')
+        self.savingsAccount[self.accountNumber][1] -= transferAmount
+        print('Transfer successful')
+        self.checkBalance()
 
 
-menu2()
+savingsAccount = SavingsAccount()
+while True:
+    print('Press 1 to create account')
+    print('Press 2 to perform a transaction')
+    print('Press 3 to exit')
+    userChoice = int(input())
+    if userChoice == 1:
+        print('Enter your name')
+        name = input()
+        print('Enter your initial deposit')
+        depositAmount = int(input())
+        savingsAccount.createAccount(name, depositAmount)
+    if userChoice == 2:
+        print('Enter your name')
+        name = input()
+        print('Enter your account number')
+        accountNumber = int(input())
+        authenticationStatus = savingsAccount.transact(name, accountNumber)
+        if authenticationStatus == True:
+            while True:
+                print('Press 1 to deposit')
+                print('Press 2 to check balance')
+                print('Press 3 to withdraw')
+                print('Press 4 to transfer')
+                print('Press 5 to enter previous menu')
+                userChoice = int(input())
+                if userChoice == 1:
+                    print('Enter withdrawal amount to be deposited')
+                    depositAmount = int(input())
+                    savingsAccount.deposit(depositAmount)
+                elif userChoice == 2:
+                    savingsAccount.checkBalance()
+                elif userChoice == 3:
+                    print('Enter withdrawal amount')
+                    withdrawalAmount = int(input())
+                    savingsAccount.withdraw(withdrawalAmount)
+                elif userChoice == 4:
+                    print('Enter transfer amount')
+                    transferAmount = int(input())
+                    savingsAccount.transfer(transferAmount)
+                elif userChoice == 5:
+                    break
+    if userChoice == 3:
+        quit()
